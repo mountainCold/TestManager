@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "CMyTab.h"
 
 
 // CTaskManagerDlg 对话框
@@ -31,4 +32,12 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	CMyTab m_Tab;
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void On32773();
+	afx_msg void On32774();
+	afx_msg void On32775();
+	afx_msg void On32776();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

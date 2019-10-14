@@ -7,6 +7,11 @@
 #include "TaskManager.h"
 #include "TaskManagerDlg.h"
 #include "afxdialogex.h"
+#include "CDlgA.h"
+#include "CDlgC.h"
+#include "CMyTab.h"
+#include "CDlgD.h"
+#include "CDlgE.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -35,6 +40,7 @@ protected:
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
 {
+	
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
@@ -59,12 +65,18 @@ CTaskManagerDlg::CTaskManagerDlg(CWnd* pParent /*=nullptr*/)
 void CTaskManagerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_TAB1, m_Tab);
 }
 
 BEGIN_MESSAGE_MAP(CTaskManagerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_SIZE()
+	ON_COMMAND(ID_32773, &CTaskManagerDlg::On32773)
+	ON_COMMAND(ID_32774, &CTaskManagerDlg::On32774)
+	ON_COMMAND(ID_32775, &CTaskManagerDlg::On32775)
+	ON_COMMAND(ID_32776, &CTaskManagerDlg::On32776)
 END_MESSAGE_MAP()
 
 
@@ -73,7 +85,7 @@ END_MESSAGE_MAP()
 BOOL CTaskManagerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	::RegisterHotKey(m_hWnd, 0x1234, MOD_CONTROL | MOD_SHIFT, 'L');
 	// 将“关于...”菜单项添加到系统菜单中。
 
 	// IDM_ABOUTBOX 必须在系统命令范围内。
@@ -98,8 +110,11 @@ BOOL CTaskManagerDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
-
-	// TODO: 在此添加额外的初始化代码
+	m_Tab.InsertTabWnd(4,
+		new CDlgA, IDD_DIALOG1,
+		new CDlgC, IDD_DIALOG3,
+		new CDlgD, IDD_DIALOG4,
+		new CDlgE, IDD_DIALOG5 );
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -153,3 +168,63 @@ HCURSOR CTaskManagerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CTaskManagerDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+	if (m_Tab.m_hWnd)
+	{
+		CRect rect = { 0,0,cx,cy };
+		m_Tab.MoveWindow(rect);
+		for (auto&i:m_Tab.m_WndVec)
+		{
+			rect.DeflateRect(1, 25, 1, 1);
+			i->MoveWindow(rect);
+		}
+	}
+	// TODO: 在此处添加消息处理程序代码
+}
+
+//关机
+void CTaskManagerDlg::On32773()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+//重启
+void CTaskManagerDlg::On32774()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+//睡眠
+void CTaskManagerDlg::On32775()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+//锁屏
+void CTaskManagerDlg::On32776()
+{
+	EnableDebugPrivilege();
+	LockWorkStation();
+}
+
+
+BOOL CTaskManagerDlg::PreTranslateMessage(MSG* pMsg)
+{
+	if ((pMsg->message==WM_HOTKEY) &&(pMsg->wParam==0x1234))
+	{
+		if (IsWindowVisible()==TRUE)
+		{
+			ShowWindow(SW_HIDE);
+		}
+		else
+		{
+			ShowWindow(SW_SHOW);
+		}
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
